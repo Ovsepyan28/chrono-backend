@@ -14,6 +14,13 @@ export class TasksService {
 
   create(createTaskDto: CreateTaskDto): Promise<Task> {
     const createdTask = new this.taskModel(createTaskDto);
+
     return createdTask.save();
+  }
+
+  delete(id: string): Promise<Task> {
+    const deletedTask = this.taskModel.findByIdAndDelete(id);
+
+    return deletedTask;
   }
 }

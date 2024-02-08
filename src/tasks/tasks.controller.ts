@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
   UsePipes,
   ValidationPipe,
@@ -22,5 +24,10 @@ export class TasksController {
   @UsePipes(new ValidationPipe())
   async createTask(@Body() dto: CreateTaskDto) {
     return this.tasksService.create(dto);
+  }
+
+  @Delete(':id')
+  async deleteTask(@Param('id') id: string) {
+    return this.tasksService.delete(id);
   }
 }
