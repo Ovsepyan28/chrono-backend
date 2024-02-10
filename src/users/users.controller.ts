@@ -19,15 +19,15 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Get()
+  getUsers() {
+    return this.usersService.getUsers();
+  }
+
   @Post()
   @UsePipes(new ValidationPipe())
   createUser(@Body() createUserDto: CreateUserDto) {
     return this.usersService.createUser(createUserDto);
-  }
-
-  @Get()
-  getUsers() {
-    return this.usersService.getUsers();
   }
 
   @Get(':id')

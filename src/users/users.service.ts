@@ -9,6 +9,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
+  getUsers() {
+    return this.userModel.find().exec();
+  }
+
   async createUser(createUserDto: CreateUserDto) {
     const existingUser = await this.userModel
       .findOne({
@@ -19,10 +23,6 @@ export class UsersService {
 
     const newUser = new this.userModel(createUserDto);
     return newUser.save();
-  }
-
-  getUsers() {
-    return this.userModel.find();
   }
 
   getUserById(id: string) {

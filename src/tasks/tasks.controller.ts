@@ -11,23 +11,23 @@ import {
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 
-@Controller('tasks')
+@Controller('api/tasks')
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Get()
-  async getTasks() {
-    return this.tasksService.getAll();
+  getTasks() {
+    return this.tasksService.getTasks();
   }
 
   @Post()
   @UsePipes(new ValidationPipe())
-  async createTask(@Body() dto: CreateTaskDto) {
-    return this.tasksService.create(dto);
+  createTask(@Body() createTaskDto: CreateTaskDto) {
+    return this.tasksService.createTask(createTaskDto);
   }
 
   @Delete(':id')
-  async deleteTask(@Param('id') id: string) {
-    return this.tasksService.delete(id);
+  deleteTask(@Param('id') id: string) {
+    return this.tasksService.deleteTask(id);
   }
 }

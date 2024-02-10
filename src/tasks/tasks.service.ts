@@ -8,19 +8,17 @@ import { CreateTaskDto } from './dto/create-task.dto';
 export class TasksService {
   constructor(@InjectModel(Task.name) private taskModel: Model<Task>) {}
 
-  getAll(): Promise<Task[]> {
+  getTasks() {
     return this.taskModel.find().exec();
   }
 
-  create(createTaskDto: CreateTaskDto): Promise<Task> {
-    const createdTask = new this.taskModel(createTaskDto);
+  createTask(createTaskDto: CreateTaskDto) {
+    const newTask = new this.taskModel(createTaskDto);
 
-    return createdTask.save();
+    return newTask.save();
   }
 
-  delete(id: string): Promise<Task> {
-    const deletedTask = this.taskModel.findByIdAndDelete(id);
-
-    return deletedTask;
+  deleteTask(id: string) {
+    return this.taskModel.findByIdAndDelete(id);
   }
 }
