@@ -16,10 +16,11 @@ export class UsersService {
   async createUser(createUserDto: CreateUserDto) {
     const existingUser = await this.userModel
       .findOne({
-        username: createUserDto.username,
+        email: createUserDto.email,
       })
       .exec();
-    if (existingUser) throw new HttpException('Username is unavailable', 404);
+    if (existingUser)
+      throw new HttpException('User with this email already exists', 404);
 
     const newUser = new this.userModel(createUserDto);
     return newUser.save();
