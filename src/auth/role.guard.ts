@@ -46,6 +46,5 @@ export class RoleGuard implements CanActivate {
     } catch (e) {
       throw new HttpException('Нет доступа', 403);
     }
-    return true;
   }
 }

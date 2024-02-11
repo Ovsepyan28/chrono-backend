@@ -8,8 +8,11 @@ import {
   UseGuards,
   UsePipes,
   ValidationPipe,
+  Headers,
+  HttpException,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import mongoose from 'mongoose';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from 'src/schemas/task.schema';
@@ -36,8 +39,25 @@ export class TasksController {
   @UseGuards(AuthGuard)
   @Post()
   @UsePipes(new ValidationPipe())
-  createTask(@Body() createTaskDto: CreateTaskDto) {
-    return this.tasksService.createTask(createTaskDto);
+  createTask(
+    @Body() createTaskDto: CreateTaskDto,
+    @Headers('authorization') authorization: string,
+  ) {
+    return this.tasksService.createTask(createTaskDto, authorization);
+  }
+
+  @ApiOperation({ summary: 'Получить задачу по ID' })
+  @ApiResponse({ status: 200, type: Task })
+  @UseGuards(AuthGuard)
+  @Get(':id')
+  async getTaskById(@Param('id') id: string) {
+    const isValid = mongoose.Types.ObjectId.isValid(id);
+    if (!isValid) throw new HttpException('Невалидный ID', 400);
+
+    const findTask = await this.tasksService.getTaskById(id);
+    if (!findTask) throw new HttpException('Задача не найдена', 404);
+
+    return findTask;
   }
 
   @ApiOperation({ summary: 'Удалить задачу' })
@@ -45,6 +65,9 @@ export class TasksController {
   @UseGuards(AuthGuard)
   @Delete(':id')
   deleteTask(@Param('id') id: string) {
+    const isValid = mongoose.Types.ObjectId.isValid(id);
+    if (!isValid) throw new HttpException('Невалидный ID', 400);
+
     return this.tasksService.deleteTask(id);
   }
 }

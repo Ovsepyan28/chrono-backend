@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class CreateTaskDto {
   @ApiProperty({
@@ -7,7 +7,8 @@ export class CreateTaskDto {
     description: 'Заголок задачи',
   })
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Обязательное поле' })
+  @MaxLength(100, { message: 'Максимальная длина заголовка 100 символов' })
   title: string;
 
   @ApiProperty({
@@ -15,6 +16,6 @@ export class CreateTaskDto {
     description: 'Описание задачи',
   })
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Обязательное поле' })
   content: number;
 }

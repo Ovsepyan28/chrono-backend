@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import mongoose from 'mongoose';
+import mongoose, { ObjectId } from 'mongoose';
+import { Transform, Type } from 'class-transformer';
 import { Task } from './task.schema';
 
 @Schema()
@@ -9,8 +10,8 @@ export class User {
     example: '65c7b307243c4d39a43531c8',
     description: 'Уникальный идентификатор пользователя',
   })
-  @Prop({ unique: true })
-  id: string;
+  @Transform(({ value }) => value.toString())
+  _id: ObjectId;
 
   @ApiProperty({
     example: 'ivanov@gmail.com',
@@ -47,6 +48,7 @@ export class User {
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
   })
+  @Type(() => Task)
   tasks: Task[];
 }
 

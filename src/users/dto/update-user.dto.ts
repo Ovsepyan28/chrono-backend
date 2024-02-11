@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Length,
+} from 'class-validator';
+import { Task } from 'src/schemas/task.schema';
 
 export class UpdateUserDto {
   @ApiProperty({
@@ -20,4 +27,13 @@ export class UpdateUserDto {
   @IsString()
   @IsOptional()
   displayName?: string;
+
+  @ApiProperty({
+    example: [],
+    description: 'Новый массив с id задач',
+    required: false,
+  })
+  @IsArray()
+  @IsOptional()
+  tasks?: Task[];
 }

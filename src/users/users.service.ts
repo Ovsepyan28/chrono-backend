@@ -30,7 +30,7 @@ export class UsersService {
   }
 
   getUserById(id: string) {
-    return this.userModel.findById(id);
+    return this.userModel.findById(id).populate('tasks');
   }
 
   async updateUser(id: string, updateUserDto: UpdateUserDto) {
@@ -43,6 +43,10 @@ export class UsersService {
 
     if (updateUserDto.displayName !== undefined) {
       targetUser.displayName = updateUserDto.displayName;
+    }
+
+    if (updateUserDto.tasks.length !== targetUser.tasks.length) {
+      targetUser.tasks = updateUserDto.tasks;
     }
 
     return this.userModel.findByIdAndUpdate(id, targetUser, { new: true });

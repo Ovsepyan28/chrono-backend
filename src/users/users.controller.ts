@@ -75,11 +75,6 @@ export class UsersController {
     const updatedUser = await this.usersService.updateUser(id, updateUserDto);
     if (!updatedUser) throw new HttpException('Пользователь не найден', 404);
 
-    //Если передали email
-    if ('email' in updateUserDto) {
-      throw new HttpException('Вы не можете изменить email', 404);
-    }
-
     return updatedUser;
   }
 
