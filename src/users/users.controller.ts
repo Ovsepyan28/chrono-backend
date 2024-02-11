@@ -18,6 +18,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from 'src/schemas/user.schema';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { Role } from 'src/auth/role-auth.decorator';
+import { RoleGuard } from 'src/auth/role.guard';
 
 @ApiTags('Пользователи')
 @Controller('api/users')
@@ -26,7 +28,8 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Получить всех пользователей' })
   @ApiResponse({ status: 200, type: [User] })
-  @UseGuards(AuthGuard)
+  @Role('admin')
+  @UseGuards(AuthGuard, RoleGuard)
   @Get()
   getUsers() {
     return this.usersService.getUsers();
@@ -34,7 +37,8 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Создать пользователя' })
   @ApiResponse({ status: 200, type: User })
-  @UseGuards(AuthGuard)
+  @Role('admin')
+  @UseGuards(AuthGuard, RoleGuard)
   @Post()
   @UsePipes(new ValidationPipe())
   createUser(@Body() createUserDto: CreateUserDto) {
@@ -43,7 +47,8 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Получить пользователя по ID' })
   @ApiResponse({ status: 200, type: User })
-  @UseGuards(AuthGuard)
+  @Role('admin')
+  @UseGuards(AuthGuard, RoleGuard)
   @Get(':id')
   async getUserById(@Param('id') id: string) {
     const isValid = mongoose.Types.ObjectId.isValid(id);

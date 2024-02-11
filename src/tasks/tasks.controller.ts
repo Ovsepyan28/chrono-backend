@@ -14,6 +14,8 @@ import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from 'src/schemas/task.schema';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { Role } from 'src/auth/role-auth.decorator';
+import { RoleGuard } from 'src/auth/role.guard';
 
 @ApiTags('Задачи')
 @Controller('api/tasks')
@@ -22,7 +24,8 @@ export class TasksController {
 
   @ApiOperation({ summary: 'Получить все задачи' })
   @ApiResponse({ status: 200, type: [Task] })
-  @UseGuards(AuthGuard)
+  @Role('admin')
+  @UseGuards(AuthGuard, RoleGuard)
   @Get()
   getTasks() {
     return this.tasksService.getTasks();
