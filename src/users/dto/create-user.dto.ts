@@ -4,7 +4,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  MinLength,
+  Length,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -12,18 +12,18 @@ export class CreateUserDto {
     example: 'ivanov@gmail.com',
     description: 'Уникальный aдрес электронной почты пользователя',
   })
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Обязательное поле' })
   @IsString()
-  @IsEmail()
+  @IsEmail({}, { message: 'Некорректный email' })
   email: string;
 
   @ApiProperty({
     example: 'PH3u8Dt6M7QhnqRPJqw3',
     description: 'Пароль пользователя',
   })
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Обязательное поле' })
   @IsString()
-  @MinLength(6)
+  @Length(6, 16, { message: 'Длина пароля от 6 до 16 символов' })
   password: string;
 
   @ApiProperty({

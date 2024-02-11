@@ -1,14 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
 
 export class UpdateUserDto {
   @ApiProperty({
     example: 'PH3u8Dt6M7QhnqRPJqw3',
     description: 'Пароль пользователя',
   })
-  @IsNotEmpty()
+  @IsNotEmpty({ message: 'Обязательное поле' })
   @IsString()
-  @MinLength(6)
+  @Length(6, 16, { message: 'Длина пароля от 6 до 16 символов' })
   @IsOptional()
   password?: string;
 
