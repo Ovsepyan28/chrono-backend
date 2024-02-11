@@ -14,14 +14,14 @@ export class Task {
     example: 'Крыша',
     description: 'Заголок задачи',
   })
-  @Prop({ required: true })
+  @Prop()
   title: string;
 
   @ApiProperty({
     example: 'Необходимо заменить покрытие крыши',
     description: 'Описание задачи',
   })
-  @Prop({ required: true })
+  @Prop()
   content: string;
 }
 

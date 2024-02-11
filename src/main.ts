@@ -1,11 +1,10 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const PORT = process.env.PORT || 5555;
   const app = await NestFactory.create(AppModule);
-
   const config = new DocumentBuilder()
     .setTitle('chrono-planner-API')
     .setDescription('REST API documentation')

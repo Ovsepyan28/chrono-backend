@@ -14,7 +14,6 @@ export class TasksService {
 
   createTask(createTaskDto: CreateTaskDto) {
     const newTask = new this.taskModel(createTaskDto);
-
     return newTask.save();
   }
 

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { ApiProperty } from '@nestjs/swagger';
 import mongoose from 'mongoose';
 import { Task } from './task.schema';
-import { ApiProperty } from '@nestjs/swagger';
 
 @Schema()
 export class User {
@@ -29,10 +29,16 @@ export class User {
   @ApiProperty({
     example: 'Александр',
     description: 'Имя пользователя, которое видят другие пользователи',
-    required: false,
   })
-  @Prop({ required: false })
-  displayName?: string;
+  @Prop()
+  displayName: string;
+
+  @ApiProperty({
+    example: 'user',
+    description: 'Роль пользователя user|admin',
+  })
+  @Prop()
+  role: string;
 
   @ApiProperty({
     example: [],

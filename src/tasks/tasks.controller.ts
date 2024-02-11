@@ -5,13 +5,15 @@ import {
   Get,
   Param,
   Post,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Task } from 'src/schemas/task.schema';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @ApiTags('Задачи')
 @Controller('api/tasks')
@@ -20,6 +22,7 @@ export class TasksController {
 
   @ApiOperation({ summary: 'Получить все задачи' })
   @ApiResponse({ status: 200, type: [Task] })
+  @UseGuards(AuthGuard)
   @Get()
   getTasks() {
     return this.tasksService.getTasks();
@@ -27,6 +30,7 @@ export class TasksController {
 
   @ApiOperation({ summary: 'Создать задачу' })
   @ApiResponse({ status: 200, type: Task })
+  @UseGuards(AuthGuard)
   @Post()
   @UsePipes(new ValidationPipe())
   createTask(@Body() createTaskDto: CreateTaskDto) {
@@ -35,6 +39,7 @@ export class TasksController {
 
   @ApiOperation({ summary: 'Удалить задачу' })
   @ApiResponse({ status: 200 })
+  @UseGuards(AuthGuard)
   @Delete(':id')
   deleteTask(@Param('id') id: string) {
     return this.tasksService.deleteTask(id);

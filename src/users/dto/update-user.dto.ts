@@ -9,7 +9,8 @@ export class UpdateUserDto {
   @IsNotEmpty()
   @IsString()
   @MinLength(6)
-  password: string;
+  @IsOptional()
+  password?: string;
 
   @ApiProperty({
     example: 'Александр',
