@@ -1,9 +1,11 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
   Get,
-  HttpException,
+  Headers,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -20,44 +22,55 @@ import { User } from 'src/schemas/user.schema';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Role } from 'src/auth/role-auth.decorator';
 import { RoleGuard } from 'src/auth/role.guard';
+import { IUser } from './users.interfaces';
+import { INCORRECT_ID_USER, NOT_FOUND_USER } from './users.constants';
+import { Role as Roles } from 'src/users/users.interfaces';
 
 @ApiTags('Пользователи')
 @Controller('api/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @ApiOperation({ summary: 'Получить всех пользователей' })
+  @ApiOperation({
+    summary: 'Получить всех пользователей',
+  })
   @ApiResponse({ status: 200, type: [User] })
-  @Role('admin')
+  @Role(Roles.ADMIN)
   @UseGuards(AuthGuard, RoleGuard)
   @Get()
-  getUsers() {
+  async getUsers(): Promise<IUser[]> {
     return this.usersService.getUsers();
   }
 
-  @ApiOperation({ summary: 'Создать пользователя' })
+  @ApiOperation({
+    summary: 'Создать пользователя',
+  })
   @ApiResponse({ status: 200, type: User })
-  @Role('admin')
+  @Role(Roles.ADMIN)
   @UseGuards(AuthGuard, RoleGuard)
   @Post()
   @UsePipes(new ValidationPipe())
-  createUser(@Body() createUserDto: CreateUserDto) {
+  async createUser(@Body() createUserDto: CreateUserDto): Promise<IUser> {
     return this.usersService.createUser(createUserDto);
   }
 
-  @ApiOperation({ summary: 'Получить пользователя по ID' })
+  @ApiOperation({
+    summary: 'Получить пользователя по ID',
+  })
   @ApiResponse({ status: 200, type: User })
-  @Role('admin')
-  @UseGuards(AuthGuard, RoleGuard)
+  @UseGuards(AuthGuard)
   @Get(':id')
-  async getUserById(@Param('id') id: string) {
-    const isValid = mongoose.Types.ObjectId.isValid(id);
-    if (!isValid) throw new HttpException('Пользователь не найден', 404);
+  async getUserByIdPopulate(
+    @Param('id') id: IUser['id'],
+    @Headers('authorization') authorization: string,
+  ): Promise<IUser> {
+    const isValid = mongoose.Types.ObjectId.isValid(String(id));
+    if (!isValid) throw new BadRequestException(INCORRECT_ID_USER);
 
-    const findUser = await this.usersService.getUserById(id);
-    if (!findUser) throw new HttpException('Пользователь не найден', 404);
+    const foundUser = await this.usersService.getUserById(id, authorization);
+    if (!foundUser) throw new NotFoundException(NOT_FOUND_USER);
 
-    return findUser;
+    return foundUser;
   }
 
   @ApiOperation({ summary: 'Обновить пользователя' })
@@ -66,28 +79,32 @@ export class UsersController {
   @Patch(':id')
   @UsePipes(new ValidationPipe())
   async updateUser(
-    @Param('id') id: string,
+    @Param('id') id: IUser['id'],
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    const isValid = mongoose.Types.ObjectId.isValid(id);
-    if (!isValid) throw new HttpException('Невалидный ID', 400);
+    const isValid = mongoose.Types.ObjectId.isValid(String(id));
+    if (!isValid) throw new BadRequestException(INCORRECT_ID_USER);
 
-    const updatedUser = await this.usersService.updateUser(id, updateUserDto);
-    if (!updatedUser) throw new HttpException('Пользователь не найден', 404);
+    const updatedUser = await this.usersService.updateUserById(
+      id,
+      updateUserDto,
+    );
+    if (!updatedUser) throw new NotFoundException(NOT_FOUND_USER);
 
     return updatedUser;
   }
 
-  @ApiOperation({ summary: 'Удалить пользователя' })
+  @ApiOperation({ summary: 'Удалить пользователя по ID' })
   @ApiResponse({ status: 200 })
-  @UseGuards(AuthGuard)
+  @Role(Roles.ADMIN)
+  @UseGuards(AuthGuard, RoleGuard)
   @Delete(':id')
-  async deleteUser(@Param('id') id: string) {
-    const isValid = mongoose.Types.ObjectId.isValid(id);
-    if (!isValid) throw new HttpException('Невалидный ID', 400);
+  async deleteUserById(@Param('id') id: IUser['id']): Promise<void> {
+    const isValid = mongoose.Types.ObjectId.isValid(String(id));
+    if (!isValid) throw new BadRequestException(INCORRECT_ID_USER);
 
-    const deletedUser = await this.usersService.deleteUser(id);
-    if (!deletedUser) throw new HttpException('Пользователь не найден', 404);
+    const deletedUser = await this.usersService.deleteUserById(id);
+    if (!deletedUser) throw new NotFoundException(NOT_FOUND_USER);
 
     return;
   }

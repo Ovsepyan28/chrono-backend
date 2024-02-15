@@ -6,18 +6,23 @@ import {
   IsString,
   Length,
 } from 'class-validator';
-import { Task } from 'src/schemas/task.schema';
+import { IUser } from '../users.interfaces';
+import { ITask } from 'src/tasks/tasks.interfaces';
+import {
+  INCORRECT_PASSWORD_AUTH,
+  REQUIRED_FIELD_AUTH,
+} from 'src/auth/auth.constants';
 
 export class UpdateUserDto {
   @ApiProperty({
     example: 'PH3u8Dt6M7QhnqRPJqw3',
     description: 'Пароль пользователя',
   })
-  @IsNotEmpty({ message: 'Обязательное поле' })
+  @IsNotEmpty({ message: REQUIRED_FIELD_AUTH })
   @IsString()
-  @Length(6, 16, { message: 'Длина пароля от 6 до 16 символов' })
+  @Length(6, 16, { message: INCORRECT_PASSWORD_AUTH })
   @IsOptional()
-  password?: string;
+  password?: IUser['password'];
 
   @ApiProperty({
     example: 'Александр',
@@ -26,14 +31,14 @@ export class UpdateUserDto {
   })
   @IsString()
   @IsOptional()
-  displayName?: string;
+  displayName?: IUser['displayName'];
 
   @ApiProperty({
     example: [],
-    description: 'Новый массив с id задач',
+    description: 'Массив с id задач',
     required: false,
   })
   @IsArray()
   @IsOptional()
-  tasks?: Task[];
+  tasks?: ITask['id'][];
 }

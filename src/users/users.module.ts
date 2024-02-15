@@ -5,6 +5,8 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { Task, TaskSchema } from 'src/schemas/task.schema';
 import { AuthModule } from 'src/auth/auth.module';
+import { UsersProvider } from './users.providers';
+import { TasksProvider } from 'src/tasks/tasks.providers';
 
 @Module({
   imports: [
@@ -14,7 +16,7 @@ import { AuthModule } from 'src/auth/auth.module';
     ]),
     forwardRef(() => AuthModule),
   ],
-  providers: [UsersService],
+  providers: [UsersService, UsersProvider, TasksProvider],
   controllers: [UsersController],
   exports: [UsersService],
 })

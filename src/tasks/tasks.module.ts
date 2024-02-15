@@ -6,6 +6,8 @@ import { Task, TaskSchema } from 'src/schemas/task.schema';
 import { AuthModule } from 'src/auth/auth.module';
 import { User, UserSchema } from 'src/schemas/user.schema';
 import { UsersService } from 'src/users/users.service';
+import { UsersProvider } from 'src/users/users.providers';
+import { TasksProvider } from './tasks.providers';
 
 @Module({
   imports: [
@@ -16,6 +18,6 @@ import { UsersService } from 'src/users/users.service';
     AuthModule,
   ],
   controllers: [TasksController],
-  providers: [TasksService, UsersService],
+  providers: [TasksService, UsersService, UsersProvider, TasksProvider],
 })
 export class TasksModule {}

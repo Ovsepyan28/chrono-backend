@@ -3,15 +3,17 @@ import { ApiProperty } from '@nestjs/swagger';
 import mongoose, { ObjectId } from 'mongoose';
 import { Transform, Type } from 'class-transformer';
 import { Task } from './task.schema';
+import { IUser, Role } from 'src/users/users.interfaces';
+import { ITask } from 'src/tasks/tasks.interfaces';
 
 @Schema()
-export class User {
+export class User implements IUser {
   @ApiProperty({
     example: '65c7b307243c4d39a43531c8',
     description: 'Уникальный идентификатор пользователя',
   })
   @Transform(({ value }) => value.toString())
-  _id: ObjectId;
+  id: ObjectId;
 
   @ApiProperty({
     example: 'ivanov@gmail.com',
@@ -39,7 +41,7 @@ export class User {
     description: 'Роль пользователя user|admin',
   })
   @Prop()
-  role: string;
+  role: Role;
 
   @ApiProperty({
     example: [],
@@ -49,7 +51,7 @@ export class User {
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
   })
   @Type(() => Task)
-  tasks: Task[];
+  tasks: ITask['id'][];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

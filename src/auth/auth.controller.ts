@@ -9,6 +9,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { User } from 'src/schemas/user.schema';
 import { AuthDto } from './dto/auth.dto';
+import { AuthRequest } from './auth.interfaces';
 
 @ApiTags('Авторизация')
 @Controller('api/auth')
@@ -19,7 +20,7 @@ export class AuthController {
   @ApiResponse({ status: 200, type: User })
   @Post('/login')
   @UsePipes(new ValidationPipe())
-  login(@Body() loginDto: AuthDto) {
+  async login(@Body() loginDto: AuthDto): Promise<AuthRequest> {
     return this.authService.login(loginDto);
   }
 
@@ -27,7 +28,7 @@ export class AuthController {
   @ApiResponse({ status: 200 })
   @Post('/registration')
   @UsePipes(new ValidationPipe())
-  registration(@Body() registrationDto: AuthDto) {
+  async registration(@Body() registrationDto: AuthDto): Promise<AuthRequest> {
     return this.authService.registration(registrationDto);
   }
 }

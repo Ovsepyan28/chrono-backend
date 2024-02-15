@@ -9,7 +9,8 @@ import {
   UsePipes,
   ValidationPipe,
   Headers,
-  HttpException,
+  BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import mongoose from 'mongoose';
@@ -19,6 +20,10 @@ import { Task } from 'src/schemas/task.schema';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Role } from 'src/auth/role-auth.decorator';
 import { RoleGuard } from 'src/auth/role.guard';
+import { ITask } from './tasks.interfaces';
+import { INCORRECT_ID_TASK, NOT_FOUND_TASK } from './tasks.constants';
+import { INCORRECT_ID_USER } from 'src/users/users.constants';
+import { Role as Roles } from 'src/users/users.interfaces';
 
 @ApiTags('Задачи')
 @Controller('api/tasks')
@@ -27,10 +32,10 @@ export class TasksController {
 
   @ApiOperation({ summary: 'Получить все задачи' })
   @ApiResponse({ status: 200, type: [Task] })
-  @Role('admin')
+  @Role(Roles.ADMIN)
   @UseGuards(AuthGuard, RoleGuard)
   @Get()
-  getTasks() {
+  async getTasks(): Promise<ITask[]> {
     return this.tasksService.getTasks();
   }
 
@@ -39,10 +44,10 @@ export class TasksController {
   @UseGuards(AuthGuard)
   @Post()
   @UsePipes(new ValidationPipe())
-  createTask(
+  async createTask(
     @Body() createTaskDto: CreateTaskDto,
     @Headers('authorization') authorization: string,
-  ) {
+  ): Promise<ITask> {
     return this.tasksService.createTask(createTaskDto, authorization);
   }
 
@@ -50,24 +55,35 @@ export class TasksController {
   @ApiResponse({ status: 200, type: Task })
   @UseGuards(AuthGuard)
   @Get(':id')
-  async getTaskById(@Param('id') id: string) {
-    const isValid = mongoose.Types.ObjectId.isValid(id);
-    if (!isValid) throw new HttpException('Невалидный ID', 400);
+  async getTaskById(
+    @Param('id') id: ITask['id'],
+    @Headers('authorization') authorization: string,
+  ): Promise<ITask> {
+    const isValid = mongoose.Types.ObjectId.isValid(String(id));
+    if (!isValid) throw new BadRequestException(INCORRECT_ID_TASK);
+    const foundTask = await this.tasksService.getTaskById(id, authorization);
+    if (!foundTask) throw new NotFoundException(NOT_FOUND_TASK);
 
-    const findTask = await this.tasksService.getTaskById(id);
-    if (!findTask) throw new HttpException('Задача не найдена', 404);
-
-    return findTask;
+    return foundTask;
   }
 
   @ApiOperation({ summary: 'Удалить задачу' })
   @ApiResponse({ status: 200 })
   @UseGuards(AuthGuard)
   @Delete(':id')
-  deleteTask(@Param('id') id: string) {
-    const isValid = mongoose.Types.ObjectId.isValid(id);
-    if (!isValid) throw new HttpException('Невалидный ID', 400);
+  async deleteTaskById(
+    @Param('id') id: ITask['id'],
+    @Headers('authorization') authorization: string,
+  ): Promise<ITask> {
+    const isValid = mongoose.Types.ObjectId.isValid(String(id));
+    if (!isValid) throw new BadRequestException(INCORRECT_ID_USER);
 
-    return this.tasksService.deleteTask(id);
+    const deletedTask = await this.tasksService.deleteTaskById(
+      id,
+      authorization,
+    );
+    if (!deletedTask) throw new NotFoundException(NOT_FOUND_TASK);
+
+    return deletedTask;
   }
 }
